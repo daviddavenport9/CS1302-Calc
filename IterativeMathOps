@@ -1,0 +1,157 @@
+package cs1302.calc;
+
+/**
+* This class implements the MathOps interface using
+* iteration to enable each operation
+*
+* @author David Davenport
+*/
+public class IterativeMathOps implements MathOps {
+
+/**
+* adds two ints using iteration
+*
+* @param lhs the left hand side of the operation
+* @param rhs the right hand side of the operation
+*/
+public int add(int lhs, int rhs)
+{
+  while (rhs != 0)
+  {
+   lhs = succ(lhs);
+   rhs = pred(rhs);
+  }//while
+  return lhs;
+}//add
+
+/**
+* subtracts two ints using iteration
+*
+* @param lhs the left hand side of the operation
+* @param rhs the right hand side of the operation
+*/
+public int sub(int lhs, int rhs)
+{
+ if (rhs > lhs) return 0;
+ while (rhs != 0)
+ {
+  lhs = pred(lhs);
+  rhs = pred(rhs);
+ }//while
+ return lhs;
+}//sub
+
+/**
+* multiplies two ints using iteration
+*
+* @param lhs the left hand side of the operation
+* @param rhs the right hand side of the operation
+*/
+public int mul(int lhs, int rhs)
+{
+ int sum = 0;
+ while (rhs != 0)
+        {
+        sum = add(sum, lhs);
+        rhs = pred(rhs);
+        }//while
+        return sum;
+}//mul
+
+/**
+* divides two ints using iteration
+*
+* @param lhs the left hand side of the operation
+* @param rhs the right hand side of the operation
+* @throws ArithmeticExpression if rhs is zero
+*/
+public int div(int lhs, int rhs) throws ArithmeticException
+{
+ int count = 0;
+ if (rhs == 0)
+ {
+ throw new ArithmeticException("Can't divide by zero");
+ }
+ if (lhs < rhs) return 0;
+ while (lhs >= rhs)
+        {
+        lhs = sub(lhs, rhs);
+        count = succ(count);
+        }
+        return count;
+}//div
+
+/**
+* computes the factorial of a number using iteration
+*
+* @param num the number to be used for the factorial
+*/
+public int fac(int num)
+{
+  int count = 1;
+  while (num > 0)
+  {
+  count = mul(count, num);
+  num = sub(num, 1);
+  }//while
+  return count;
+}//fac
+
+/**
+* computes powers using iteration
+*
+* @param lhs the left hand side of the operation and the base of the operation
+* @param rhs the right hand side of the operation and the exponent of the operation
+*/
+public int pow(int lhs, int rhs)
+{
+ int total = 1;
+ for (int i =0; i < rhs; i++)
+ {
+  total = mul(lhs, total);
+ }
+ return total;
+}//pow
+
+/**
+* left shifts an integer using iteration
+*
+* @param lhs the left hand side of the operation and number that is shifted
+* @param rhs the right hand side of the operation and number of how many shifts
+*/
+public int lshift(int lhs, int rhs)
+{
+ int sum;
+ if (rhs == 0)
+ {
+ return lhs;
+ }
+ while (rhs != 0)
+        {
+       lhs = mul(lhs, 2);
+       rhs = pred(rhs);
+        }
+        return lhs;
+}//lshift
+
+/**
+* right shifts an integer using iteration
+*
+* @param lhs the left hand side of the operation and number that is shifted
+* @param rhs the right hand side of the operation and number of how many shifts               
+*/
+public int rshift(int lhs, int rhs)
+{
+ if (rhs == 0)
+ {
+ return lhs;
+ }
+   while (rhs != 0)
+   {
+   lhs = div(lhs, 2);
+   rhs = pred(rhs);
+   }
+   return lhs;
+}//rshift
+}//class
+
