@@ -1,0 +1,427 @@
+
+package cs1302.calc;
+
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.Menu;
+import javafx.scene.control.Label;
+import javafx.scene.text.Text;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Button;
+import javafx.scene.control.ToolBar;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Separator;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+
+/**
+ * This class creates a programmer's calculator
+ * that is able to perform operations using
+ * iteration or recursion depending on the 
+ * button toggle.
+ *
+ * @author David Davenport
+ */
+
+public class CalcApp extends Application {
+       MenuBar menuBar = new MenuBar();
+       VBox vBox = new VBox();
+       HBox hBox1 = new HBox();
+       HBox hBox2 = new HBox();
+       HBox hBox3 = new HBox();
+       HBox hBox4 = new HBox();
+       HBox hBox5 = new HBox();
+       HBox hBox6 = new HBox();
+       Scene scene = new Scene(vBox);
+       TextField expressionBar = new TextField();
+        Text[] textArray = new Text[33];
+       TextField resultsBar = new TextField();
+       ToolBar toolBar = new ToolBar();
+       MenuItem hideShowBitToggle;
+       protected ImageView imageView;
+       protected String expression = "";
+       protected int result = 0;
+       protected String resultString;
+       protected int bitResult;
+       protected int newBitResult;
+       protected String binaryResult;
+       ToggleButton recButton = new ToggleButton("[Recursive]");
+       ToggleButton itrButton = new ToggleButton("Iterative");
+       
+/**This method is used to construct the GUI calculator*/
+    @Override
+    public void start(Stage stage) {
+	// Test BasicMathOps and MathOpsEvaluator
+	MathOps basicMathOps = new BasicMathOps();
+	String expr = "2 + 12 / 2 - 3 !";
+	try {
+	    int result = MathOpsEvaluator.evaluate(basicMathOps, expr);
+	    System.out.printf("%s = %d \n", expr, result);
+	} catch (Exception e) {
+	    System.err.println(e);
+	    System.err.println("something went wrong!");
+	} // try
+	// Construct GUI; can replace
+        stage.setTitle("cs1302-calc!");
+        stage.setScene(scene);
+        menuBar();
+        vBox.getChildren().add(expressionBar);
+        vBox.getChildren().add(resultsBar);
+        Text letterS = new Text("S");
+        toolBar.getItems().add(letterS);
+        makeBitToggle();
+        vBox.getChildren().add(hBox1);
+        vBox.getChildren().add(hBox2);
+        vBox.getChildren().add(hBox3);
+        vBox.getChildren().add(hBox4);
+        vBox.getChildren().add(hBox5);
+        vBox.getChildren().add(hBox6);
+        makeNumButtons();
+        makeRecButton();
+        makeItrButton();
+        makeEvalButton();
+        makeOpButtons();
+        makeBackspaceButton();
+        makeClearButton();
+	      stage.sizeToScene();
+        stage.show();
+    } // start
+/**
+ * Creates the bit toggle and enables the user to change 
+ * each bit with the click of the mouse
+ */
+    public void makeBitToggle()
+    {
+    for (int i = 30; i >= 0; i--){
+    int j = i;
+    textArray[i] = new Text("0");
+    /* adds a separator every 8 bits */
+    if ((i == 7) || (i == 15) || (i == 23)){
+     toolBar.getItems().add(new Separator());
+    }//if
+    /* enables the user to click on bits*/
+    textArray[i].setOnMouseClicked(e -> {
+    if (textArray[j].getText().equals("0")){
+      textArray[j].setText("1");
+      if (textArray[j].getText().equals("1")){
+      bitResult = (int)Math.pow(2, j);
+      newBitResult += bitResult;
+      }//if
+    }//if
+    else {
+      textArray[j].setText("0");
+      if (textArray[j].getText().equals("0")){
+      bitResult = (int)Math.pow(2, j);
+      newBitResult -= bitResult;
+      }//if
+    }//else
+   resultString = "";
+    resultString = Integer.toString(newBitResult + result);
+    resultsBar.setText(resultString);
+    });//lambda
+    toolBar.getItems().add(textArray[i]);
+    }//for
+    vBox.getChildren().add(toolBar);
+    }//makeBitToggle
+/**
+* Creates the menu bar and adds the file, theme, window, 
+*  and help menu and performs their respective actions
+*/
+    public void menuBar()
+      {
+        Menu fileMenu = new Menu("File");
+        MenuItem exitMenu = new MenuItem("Exit");
+        exitMenu.setOnAction(e -> {
+        Platform.exit();
+        System.exit(0); //exits the app
+        });
+        Menu themeMenu = new Menu("Theme");
+        Menu windowMenu = new Menu("Window");
+        hideShowBitToggle = new MenuItem("Hide bit toggle");
+        hideShowBitToggle.setOnAction(e -> {
+          bitToggleHideShow();
+        });
+        Menu helpMenu = new Menu("Help");
+        MenuItem aboutMenu = new MenuItem("About");
+        aboutMenu.setOnAction(e ->  {
+        newWindow();
+        });
+        helpMenu.getItems().add(aboutMenu);
+        fileMenu.getItems().add(exitMenu);
+        windowMenu.getItems().add(hideShowBitToggle);
+        menuBar.getMenus().add(fileMenu);
+        menuBar.getMenus().add(themeMenu);
+        menuBar.getMenus().add(windowMenu);
+        menuBar.getMenus().add(helpMenu);
+        vBox.getChildren().add(menuBar);
+      }//menuBar
+/**
+* Hides and shows the bit toggle toolbar accordingly
+*/    
+      private void bitToggleHideShow()
+      {
+       if (hideShowBitToggle.getText().equals("Hide bit toggle"))
+         {
+         toolBar.setVisible(false);
+         toolBar.setManaged(false);
+         hideShowBitToggle.setText("Show bit toggle");
+         }
+         else
+         {
+         toolBar.setVisible(true);
+         toolBar.setManaged(true);
+         hideShowBitToggle.setText("Hide bit toggle");
+         }
+      }
+/**
+* Creates the new pop up window for the about menu item
+* and includes a picture, name, version number, and email
+*/  
+       public void newWindow()
+       {
+       Stage newStage = new Stage(); 
+       newStage.setTitle("About David Davenport");
+       VBox newVBox = new VBox();
+       Scene newScene = new Scene(newVBox, 400, 400);
+       newStage.setScene(newScene);
+       newStage.setResizable(false);
+       newVBox.setFillWidth(false);
+       Label name = new Label("David Davenport");
+       newVBox.getChildren().add(name);
+       Label email = new Label("dbd34563@uga.edu");
+       newVBox.getChildren().add(email);
+       Label versionNumber = new Label("Version 6.9");
+       newVBox.getChildren().add(versionNumber);
+       Image newImage = new Image("https://i.imgur.com/P2bfEwx.jpg"); //picture of me
+       imageView = new ImageView(newImage);
+       imageView.setFitHeight(400);
+       imageView.setFitWidth(400);
+       newVBox.getChildren().add(imageView);
+       newStage.show();
+       }//newWindow
+/**
+*Creates each of the numbered buttons and builds them
+* onto the expression when pressed
+*/
+        public void makeNumButtons()
+        {
+        Button button0 = new Button("0");
+        button0.setOnAction(e -> expressionBar.setText(expression += "0"));
+        Button button1 = new Button("1");
+        button1.setOnAction(e -> expressionBar.setText(expression += "1"));
+        Button button2 = new Button("2");
+        button2.setOnAction(e -> expressionBar.setText(expression += "2"));
+        Button button3 = new Button("3");
+        button3.setOnAction(e -> expressionBar.setText(expression += "3"));
+        Button button4 = new Button("4");
+        button4.setOnAction(e -> expressionBar.setText(expression += "4"));
+        Button button5 = new Button("5");
+        button5.setOnAction(e -> expressionBar.setText(expression += "5"));
+        Button button6 = new Button("6");
+        button6.setOnAction(e -> expressionBar.setText(expression += "6"));
+        Button button7 = new Button("7");
+        button7.setOnAction(e -> expressionBar.setText(expression += "7"));
+        Button button8 = new Button("8");
+        button8.setOnAction(e -> expressionBar.setText(expression += "8"));
+        Button button9 = new Button("9");
+        button9.setOnAction(e -> expressionBar.setText(expression += "9"));
+        hBox4.getChildren().addAll(button4, button5, button6);
+        hBox3.getChildren().addAll(button7, button8, button9);
+        hBox5.getChildren().addAll(button1, button2, button3);
+        hBox6.getChildren().add(button0);
+        }
+/**
+* Makes the evaluate button and evaluates the expression 
+* depending on the iterative and recursive toggle buttons
+*/        
+        public void makeEvalButton()
+        {
+         Button evalButton = new Button("Evaulate");
+         evalButton.setOnAction(e -> {
+         if (itrButton.getText().equals("[Iterative]")){
+         MathOps iterativeMathOps = new IterativeMathOps();
+	        try {
+	          result = MathOpsEvaluator.evaluate(iterativeMathOps, expression);
+            resultString = Integer.toString(result);
+            System.out.printf("%s = %d \n", expression, result);
+            resultsBar.setText(resultString);
+            bitToggleEvaluatorHelper();
+	          } catch (Exception q) {
+              makeAlert();
+	          } // try
+         }//if
+          if (recButton.getText().equals("[Recursive]")){
+             MathOps recursiveMathOps = new RecursiveMathOps();
+          try {
+	          result = MathOpsEvaluator.evaluate(recursiveMathOps, expression);
+            resultString = Integer.toString(result);
+            System.out.printf("%s = %d \n", expression, result);
+            resultsBar.setText(resultString);
+            bitToggleEvaluatorHelper();
+	          } catch (Exception q) {
+              makeAlert();
+	           } // try
+            }//if
+          });//setOnAction
+         hBox6.getChildren().add(evalButton);
+        }//makeEvalButton
+/**
+* Creates the error dialogue if the expression 
+* cannot be evaluated 
+*/       
+      private void makeAlert()
+      {
+      Alert alert = new Alert(AlertType.INFORMATION);
+      alert.setTitle("Error");
+      alert.setHeaderText("The Expression Cannot be Evaluated");
+      //alert.setContentText("");
+      alert.showAndWait();
+      }
+/**
+* updates the bit toggle everytime the 
+* evaluation is updated
+*/
+        private void bitToggleEvaluatorHelper()
+        {
+         binaryResult = Integer.toBinaryString(result);
+         for (int i = 30; i > 0; i--)
+         {
+           textArray[i].setText("0");
+           /*
+           sets the binary number to update the bit toggle
+           */
+           for (int j = binaryResult.length() -1, k = 0; j >= 0; j--, k++)
+           {
+          textArray[j].setText(Character.toString(binaryResult.charAt(k)));
+           }
+         }//for
+        }//bitToggleEvaluatorHelper
+/**
+* Makes the operation buttons used
+* for evaluation and adds them to the expression
+*/       
+        public void makeOpButtons()
+        {
+         Button addButton = new Button("+");
+         addButton.setOnAction(e -> expressionBar.setText(expression += " + "));
+         Button subButton = new Button("-");
+         subButton.setOnAction(e -> expressionBar.setText(expression+= " - "));
+         Button mulButton = new Button("*");
+         mulButton.setOnAction(e -> expressionBar.setText(expression += " * "));
+         Button divButton = new Button("/");
+         divButton.setOnAction(e -> expressionBar.setText(expression += " / "));
+         Button expButton = new Button("^^");
+         expButton.setOnAction(e -> expressionBar.setText(expression += " ^^ "));
+         Button lshiftButton = new Button("<<");
+         lshiftButton.setOnAction(e -> expressionBar.setText(expression += " << "));
+         Button rshiftButton = new Button(">>");
+         rshiftButton.setOnAction(e -> expressionBar.setText(expression += " >> "));
+         Button facButton = new Button("!");
+         facButton.setOnAction(e -> expressionBar.setText(expression += " ! "));
+         hBox2.getChildren().addAll(lshiftButton, rshiftButton, expButton, facButton);
+         hBox3.getChildren().add(divButton);
+         hBox4.getChildren().addAll(mulButton);
+         hBox5.getChildren().add(subButton);
+         hBox6.getChildren().add(addButton);
+        }//makeOpButtons
+/**
+* Makes the recursive button used to toggle between 
+* button type
+*/
+        public void makeRecButton()
+        {
+        recButton.setOnAction(e -> {
+         if (recButton.getText().equals("Recursive"))
+         {
+         recButton.setText("[Recursive]");
+         }
+         else
+         {
+         recButton.setText("Recursive");
+         }
+        });//setOnAction
+        hBox1.getChildren().add(recButton);
+        }//makeRecButton
+/**
+* Makes the iterative button used to toggle between 
+* button type
+*/
+         public void makeItrButton()
+        {
+        itrButton.setOnAction(e -> {
+         if (itrButton.getText().equals("Iterative"))
+         {
+         itrButton.setText("[Iterative]");
+         }
+         else
+         {
+         itrButton.setText("Iterative");
+         }
+        });//setOnAction
+        hBox1.getChildren().add(itrButton);
+        }//makeItrButton
+/**
+* Creates the backspace button that has it delete
+* one non white space character everytime it is pressed
+*/        
+        public void makeBackspaceButton()
+        {
+         Button backspaceButton = new Button("Backspace");
+         backspaceButton.setOnAction(e -> {
+         if (expression.length() >= 1)
+           {
+           /*Creates a new string that is one character smaller and trims it*/
+            String newExpression = expression.substring(0, expression.length()-1).trim();
+            expressionBar.setText(newExpression);
+            expression = newExpression;
+           }//if
+         });//setOnAction
+         hBox1.getChildren().add(backspaceButton);
+        }//makeSpaceButton
+/**
+* Creates the clear button that wipes the expression and 
+* result and resets the bit toggle
+*/        
+        public void makeClearButton()
+        {
+          Button clearButton = new Button("Clear");
+          clearButton.setOnAction(e -> {
+          expressionBar.clear();
+          resultsBar.clear();
+          expression = "";
+          result = 0;
+          binaryResult = "";
+           for (int i = 30; i >= 0; i--){
+           int j = i;
+           textArray[j].setText("0");
+           }//for
+          });//setOnAction
+          hBox1.getChildren().add(clearButton);
+        }//makeClearButton
+/**
+* used to launch the GUI and execute program
+*/        
+    public static void main(String[] args) {
+	try {
+	    Application.launch(args);
+	} catch (UnsupportedOperationException e) {
+	    System.out.println(e);
+	    System.err.println("If this is a DISPLAY problem, then your X server connection");
+	    System.err.println("has likely timed out. This can generally be fixed by logging");
+	    System.err.println("out and logging back in.");
+	    System.exit(1);
+	} // try
+    } // main
+
+} // CalcApp
+
